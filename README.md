@@ -33,7 +33,13 @@ Measured on arm64 macOS with MRI 4.0.7, JRuby 10.1.2.0 (OpenJDK 25.0.2) and Truf
 
 Memory: neither `fast_blank` nor Active Support 8.1.4 allocates on MRI (0 objects per 100,000 calls). On JRuby `fast_blank` allocates nothing, while Active Support allocates about 208 bytes per call, and about 4 KB per call on a string of 136 spaces.
 
-To compare on your machine, `bundle exec rake bench` compiles the extension and runs `./benchmark`, which checks `blank?` and `blank_as?` against two regexp-based implementations.
+To reproduce the table on your machine (it prints one engine's columns):
+
+    bundle config set --local with bench   # installs Active Support, an optional group
+    bundle install
+    bundle exec rake bench:activesupport
+
+`bundle exec rake bench` compiles the extension and runs `./benchmark`, which checks `blank?` and `blank_as?` against two regexp-based implementations.
 
 ### Compatibility note:
 

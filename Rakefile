@@ -37,3 +37,10 @@ task :bench => [:compile] do
   exec './benchmark'
 end
 
+namespace :bench do
+  desc 'Compare with Active Support (needs `bundle config set --local with bench`)'
+  task :activesupport => [:compile] do
+    ruby 'bench/compare_activesupport.rb'
+  end
+end
+
