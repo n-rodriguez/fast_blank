@@ -115,6 +115,22 @@ describe String do
     expect { invalid.blank_as? }.to raise_error(ArgumentError)
   end
 
+  # JRuby and TruffleRuby have no Ractor.
+  if defined?(Ractor)
+    it "can be called from a non-main Ractor" do
+      # begin/ensure rather than ensure in the do block: Ruby < 2.5 must parse this file.
+      experimental = Warning[:experimental]
+      begin
+        Warning[:experimental] = false
+        ractor = Ractor.new { ["  ".blank?, "  ".blank_as?] }
+        result = ractor.respond_to?(:value) ? ractor.value : ractor.take
+        expect(result).to eq([true, true])
+      ensure
+        Warning[:experimental] = experimental
+      end
+    end
+  end
+
   it "treats \u0000 correctly" do
     # odd I know
     expect("\u0000".strip.length).to eq(0)

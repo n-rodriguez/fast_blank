@@ -104,6 +104,10 @@ rb_str_blank(VALUE str)
 
 void Init_fast_blank( void )
 {
+  /* Both methods are pure functions of their receiver, with no global state. */
+#ifdef HAVE_RB_EXT_RACTOR_SAFE
+  rb_ext_ractor_safe(true);
+#endif
   rb_define_method(rb_cString, "blank?", rb_str_blank, 0);
   rb_define_method(rb_cString, "blank_as?", rb_str_blank_as, 0);
 }
