@@ -1,7 +1,5 @@
-#include <stdio.h>
 #include <ruby.h>
 #include <ruby/encoding.h>
-#include <ruby/re.h>
 #include <ruby/version.h>
 
 #define STR_ENC_GET(str) rb_enc_from_index(ENCODING_GET(str))
@@ -38,7 +36,7 @@ rb_str_blank_as(VALUE str)
 
   enc = STR_ENC_GET(str);
   s = RSTRING_PTR(str);
-  if (!s || RSTRING_LEN(str) == 0) return Qtrue;
+  if (RSTRING_LEN(str) == 0) return Qtrue;
   if (str_ascii_only_p(str, enc)) return ascii_blank(s, RSTRING_END(str), 0);
 
   /* The table below lists Unicode code points; in any other encoding a code
@@ -106,7 +104,7 @@ rb_str_blank(VALUE str)
 
   enc = STR_ENC_GET(str);
   s = RSTRING_PTR(str);
-  if (!s || RSTRING_LEN(str) == 0) return Qtrue;
+  if (RSTRING_LEN(str) == 0) return Qtrue;
   if (str_ascii_only_p(str, enc)) return ascii_blank(s, RSTRING_END(str), 1);
 
   e = RSTRING_END(str);

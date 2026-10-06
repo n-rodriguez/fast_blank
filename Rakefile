@@ -13,8 +13,11 @@ if RUBY_ENGINE == 'jruby'
   require 'rake/javaextensiontask'
   Rake::JavaExtensionTask.new( 'fast_blank', gem ) do |ext|
     ext.ext_dir = 'ext/java'
+    # Java 8 bytecode keeps the jar loadable by JRuby 9.4, which runs on Java 8;
+    # newer javac versions flag that target as obsolete, which is expected.
     ext.source_version = '1.8'
     ext.target_version = '1.8'
+    ext.lint_option = 'all,-options'
   end
   # Install should not compile since it is already compiled.
   # Use 'rake compile' if you want to re-compile for development.

@@ -11,6 +11,12 @@ import org.jruby.util.ByteList;
 import org.jruby.util.StringSupport;
 import org.jruby.util.io.EncodingUtils;
 
+// defineAnnotatedMethods(Class) and encCodepointLength(Ruby, ...) are deprecated
+// in JRuby 10, but their replacements (defineMethods(ThreadContext, ...),
+// encCodepointLength(ThreadContext, ...)) do not exist in JRuby 9.4, and the
+// overload without a runtime throws a Java IllegalArgumentException instead of
+// a Ruby ArgumentError on invalid bytes. Kept so one jar serves JRuby 9.4 and 10.
+@SuppressWarnings("deprecation")
 public class FastBlankLibrary implements Library {
     public void load(Ruby runtime, boolean wrap) {
         runtime.getString().defineAnnotatedMethods(FastBlankLibrary.class);
@@ -134,7 +140,6 @@ public class FastBlankLibrary implements Library {
 
     // MRI: rb_isspace
     private static boolean isSpaceCodepoint(int codepoint) {
-        long c = codepoint & 0xFFFFFFFF;
-        return c == ' ' || ('\t' <= c && c <= '\r');
+        return codepoint == ' ' || ('\t' <= codepoint && codepoint <= '\r');
     }
 }
