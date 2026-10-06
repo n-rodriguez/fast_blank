@@ -12,6 +12,23 @@
 # define ruby_version_before_2_2() (RUBY_API_VERSION_CODE < 20200)
 #endif
 
+/* Fast path for 7-bit strings in ASCII-compatible encodings: every byte is a
+   whole character, so no code point decoding is needed. */
+static int
+str_ascii_only_p(VALUE str, rb_encoding *enc)
+{
+  return rb_enc_asciicompat(enc) && rb_enc_str_coderange(str) == ENC_CODERANGE_7BIT;
+}
+
+static VALUE
+ascii_blank(const char *s, const char *e, int nul_is_blank)
+{
+  for (; s < e; s++) {
+    if (!rb_isspace((unsigned char)*s) && !(nul_is_blank && *s == '\0')) return Qfalse;
+  }
+  return Qtrue;
+}
+
 static VALUE
 rb_str_blank_as(VALUE str)
 {
@@ -22,6 +39,7 @@ rb_str_blank_as(VALUE str)
   enc = STR_ENC_GET(str);
   s = RSTRING_PTR(str);
   if (!s || RSTRING_LEN(str) == 0) return Qtrue;
+  if (str_ascii_only_p(str, enc)) return ascii_blank(s, RSTRING_END(str), 0);
 
   /* The table below lists Unicode code points; in any other encoding a code
      is only meaningful to that encoding's own ctype table, which is what
@@ -89,6 +107,7 @@ rb_str_blank(VALUE str)
   enc = STR_ENC_GET(str);
   s = RSTRING_PTR(str);
   if (!s || RSTRING_LEN(str) == 0) return Qtrue;
+  if (str_ascii_only_p(str, enc)) return ascii_blank(s, RSTRING_END(str), 1);
 
   e = RSTRING_END(str);
   while (s < e) {

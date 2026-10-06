@@ -33,6 +33,16 @@ public class FastBlankLibrary implements Library {
 
         e = s + sByteList.realSize();
 
+        // Fast path for 7-bit strings in ASCII-compatible encodings, as in blank?,
+        // except that NUL is not blank here. scanForCodeRange() computes the code
+        // range when getCodeRange() would still report it as unknown.
+        if (enc.isAsciiCompatible() && str.scanForCodeRange() == StringSupport.CR_7BIT) {
+            for (int i = s; i < e; i++) {
+                if (sBytes[i] == 0 || !isSpace(sBytes[i])) return context.fals;
+            }
+            return context.tru;
+        }
+
         // The table below lists Unicode code points; in any other encoding a code
         // is only meaningful to that encoding's own ctype table, which is what
         // Active Support's /[[:space:]]/ consults.
@@ -95,7 +105,7 @@ public class FastBlankLibrary implements Library {
         int e = s + sByteList.realSize();
 
         // Move to slower path if the string contains non 7-bit ASCII.
-        if (str.getCodeRange() != StringSupport.CR_7BIT) return blankSlow(context, sBytes, s, e, str.getEncoding());
+        if (str.scanForCodeRange() != StringSupport.CR_7BIT) return blankSlow(context, sBytes, s, e, str.getEncoding());
 
         for (int i = s; i < e; i++) {
             if (!isSpace(sBytes[i])) return context.fals;
