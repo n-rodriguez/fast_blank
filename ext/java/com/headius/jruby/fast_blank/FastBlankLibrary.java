@@ -32,9 +32,20 @@ public class FastBlankLibrary implements Library {
         if (str.size() == 0) return context.tru;
 
         e = s + sByteList.realSize();
+
+        // The table below lists Unicode code points; in any other encoding a code
+        // is only meaningful to that encoding's own ctype table, which is what
+        // Active Support's /[[:space:]]/ consults.
+        boolean unicode = enc.isUnicode();
         int[] n = {0};
         while (s < e) {
             int cc = EncodingUtils.encCodepointLength(runtime, sBytes, s, e, n, enc);
+
+            if (!unicode) {
+                if (!enc.isSpace(cc)) return context.fals;
+                s += n[0];
+                continue;
+            }
 
             switch (cc) {
                 case 9:

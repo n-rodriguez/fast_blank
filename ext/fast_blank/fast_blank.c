@@ -17,15 +17,29 @@ rb_str_blank_as(VALUE str)
 {
   rb_encoding *enc;
   char *s, *e;
+  int unicode;
 
   enc = STR_ENC_GET(str);
   s = RSTRING_PTR(str);
   if (!s || RSTRING_LEN(str) == 0) return Qtrue;
 
+  /* The table below lists Unicode code points; in any other encoding a code
+     is only meaningful to that encoding's own ctype table, which is what
+     Active Support's /[[:space:]]/ consults. */
+  unicode = rb_enc_unicode_p(enc);
+
   e = RSTRING_END(str);
   while (s < e) {
     int n;
     unsigned int cc = rb_enc_codepoint_len(s, e, &n, enc);
+
+    if (!unicode) {
+      /* rb_enc_isspace() also accepts some multibyte codes (Emacs-Mule,
+         stateless-ISO-2022-JP) that /[[:space:]]/ does not match. */
+      if (n > 1 || !rb_enc_isspace(cc, enc)) return Qfalse;
+      s += n;
+      continue;
+    }
 
     switch (cc) {
       case 9:
