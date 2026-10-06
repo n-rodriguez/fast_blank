@@ -48,7 +48,8 @@ end
 
 # Every Unicode space transcoded into every ASCII-compatible encoding that can
 # represent it (up to four bytes, e.g. GB18030). Only compared with Active
-# Support: String#strip itself raises on some of them on JRuby 10.1.2.
+# Support: String#strip itself raises on some of them on JRuby 9.4 and 10.1
+# (https://github.com/jruby/jruby/issues/9776).
 UNICODE_SPACES = [0x85, 0xa0, 0x1680, *0x2000..0x200a, 0x2028, 0x2029, 0x202f, 0x205f, 0x3000]
 TRANSCODED_SPACES = ASCII_COMPATIBLE.product(UNICODE_SPACES).map do |enc, cp|
   begin
