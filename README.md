@@ -47,7 +47,7 @@ CI runs the test suite on MRI 2.0 to 4.0, JRuby and TruffleRuby.
 
 * **MRI** uses the C extension.
 * **JRuby** uses the Java extension shipped as `lib/fast_blank.jar`. It is compiled to Java 8 bytecode so that the same jar also loads on JRuby 9.4.
-* **TruffleRuby** does not load the C extension: TruffleRuby runs C extensions through an emulation layer that made both methods slower than Active Support, so they are implemented in Ruby there, with the same semantics.
+* **TruffleRuby** neither builds nor loads the C extension: TruffleRuby runs C extensions through an emulation layer that made both methods slower than Active Support, so they are implemented in Ruby there, with the same semantics.
 
 `fast_blank` implements `String#blank?` as MRI would have implemented it, meaning it has 100% parity with `String#strip.length == 0`.
 
@@ -66,7 +66,7 @@ Unreleased:
   - Fix `blank_as?` in non-Unicode encodings (Windows-1252, ISO-8859-*, binary…), where bytes such as `0x85` and `0xA0` were compared to Unicode code points and visible characters were reported as blank
   - JRuby: 7-bit fast path for `blank_as?` too (it was already there for `blank?`), also taken when the code range has not been computed yet
   - 7-bit fast path in the C extension (`blank?` and `blank_as?`)
-  - Pure-Ruby implementation on TruffleRuby instead of the C extension
+  - Pure-Ruby implementation on TruffleRuby instead of the C extension, which is no longer built there
   - The C extension can be used from non-main Ractors
 
 1.0.1:

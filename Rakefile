@@ -19,6 +19,9 @@ if RUBY_ENGINE == 'jruby'
     ext.target_version = '1.8'
     ext.lint_option = 'all,-options'
   end
+elsif RUBY_ENGINE == 'truffleruby'
+  # lib/fast_blank.rb implements the methods in Ruby there: nothing to build.
+  task :compile
 else
   Rake::ExtensionTask.new( 'fast_blank', gem )
 end
