@@ -19,9 +19,6 @@ if RUBY_ENGINE == 'jruby'
     ext.target_version = '1.8'
     ext.lint_option = 'all,-options'
   end
-  # Install should not compile since it is already compiled.
-  # Use 'rake compile' if you want to re-compile for development.
-  task :default => :spec
 else
   Rake::ExtensionTask.new( 'fast_blank', gem )
 end
